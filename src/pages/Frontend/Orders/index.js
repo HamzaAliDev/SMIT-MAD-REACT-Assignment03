@@ -78,7 +78,7 @@ export default function Orders() {
             <div className="container">
               <div className="text-center ">
                 <h5 className="section-title ff-secondary text-center text-primary fw-normal">Placed Orders</h5>
-                <h1 className="mb-5">Your Orders</h1>
+                <h1 className="mb-5 order-heading">Your Orders</h1>
                 <div>
                   {data.map((order, i) => (
                     <Card key={i} hoverable className='mb-3' >

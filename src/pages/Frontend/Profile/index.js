@@ -97,17 +97,17 @@ export default function Profile() {
                         <div className="container">
                             <div className="text-center">
                                 <h5 className="section-title ff-secondary text-center text-primary fw-normal">User Profile</h5>
-                                <h1 className="mb-5">Your Profile</h1>
+                                <h1 className="mb-5" style={{fontFamily:'Lato'}}>Your Profile</h1>
                                 <div className="row d-flex  justify-content-center">
                                     <div className="col-lg-6">
                                         <Card hoverable>
                                             <div className="card-body">
-                                                <h4 className='card-title text-primary'>Profile Card</h4>
-                                                <div style={{ textAlign: 'left' }}>
+                                                <h4 className='card-title text-primary' style={{fontFamily:'Lato'}}>Profile Card</h4>
+                                                <div style={{ textAlign: 'left',fontFamily:'Lato' }}>
                                                     <i className="fa fs-4 fa-user text-primary ms-3 mt-4 text-left"></i>
-                                                    <span className='fs-5 fw-semibold ms-3 '>{currentUser.fullName}</span><br />
+                                                    <span className='fs-5 fw-semibold ms-4 '>{currentUser.fullName}</span><br />
                                                     <i className='fa fs-4 fa-receipt text-primary ms-3 mt-4'></i>
-                                                    <span className='fs-5 fw-semibold ms-3' onClick={() => showModal('current-order')}>Current Order</span><br />
+                                                    <span className='fs-5 fw-semibold ms-4' onClick={() => showModal('current-order')}>Current Order</span><br />
                                                     <i className='fa fs-4 fa-list-alt text-primary ms-3 mt-4'></i>
                                                     <span className='fs-5 fw-semibold ms-3' onClick={() => showModal('order-history')}>Order History</span><br />
                                                     <i className='fa fs-4 fa-user-edit text-primary ms-3 mt-4'></i>

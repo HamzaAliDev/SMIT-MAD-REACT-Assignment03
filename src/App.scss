@@ -1,6 +1,8 @@
 @import './scss/bootstrap';
 @import './scss/landing';
 @import './scss/auth';
+@import './scss/footer';
+@import './scss/navbar';
 #root{
     display: flex;
     flex-direction: column;
@@ -23,109 +25,6 @@ main{
 }
 
 
-// navbar
-.navbar-dark .navbar-nav .nav-link {
-    position: relative;
-    margin-left: 25px;
-    padding: 35px 0;
-    font-size: 15px;
-    color: #F1F8FF !important;
-    text-transform: uppercase;
-    font-weight: 500;
-    outline: none;
-    transition: .5s;
-    
-}
-
-.sticky-top.navbar-dark .navbar-nav .nav-link {
-    padding: 20px 0;
-}
-
-.navbar-dark .navbar-nav .nav-link:hover,
-.navbar-dark .navbar-nav .nav-link.active {
-    color: #ee4d2a !important;
-}
-
-.navbar-dark .navbar-brand img {
-    max-height: 60px;
-}
-
-.sticky-top.navbar-dark .navbar-brand img {
-    max-height: 45px;
-}
-
-@media (max-width: 991.98px) {
-    .sticky-top.navbar-dark {
-        position: relative;
-    }
-
-    .navbar-dark .navbar-collapse {
-        margin-top: 15px;
-        border-top: 1px solid rgba(255, 255, 255, .1)
-    }
-
-    .navbar-dark .navbar-nav .nav-link,
-    .sticky-top.navbar-dark .navbar-nav .nav-link {
-        padding: 10px 0;
-        margin-left: 0;
-    }
-
-    .navbar-dark .navbar-brand img {
-        max-height: 45px;
-    }
-}
-
-@media (min-width: 992px) {
-    .navbar-dark {
-        position: absolute;
-        width: 100%;
-        top: 0;
-        left: 0;
-        z-index: 999;
-        background: transparent !important;
-    }
-    
-    .sticky-top.navbar-dark {
-        position: fixed;
-        background: #0F172B !important;
-    }
-}
-
-
-
-
-
-
-
-.dropdown-menu-header {
-    display: none; 
-    position: absolute; 
-    // top: 80%; 
-    // right: 0; 
-    background-color: whitesmoke;
-    padding-left: 12px;
-       
-}
-  
-.dropdown-menu-header.visible { 
-    display: block; 
-}
-.dropdown-menu-header .dropdown-link{
-    text-decoration: none;
-    color: black;
-}
-.dropdown-menu-header .dropdown-link:hover {
-    color: #ee4d2a;
-}
-
-
-
-
-
-
-
-
-
 /*** Service ***/
 .service-item {
     box-shadow: 0 0 45px rgba(0, 0, 0, .08);
@@ -146,20 +45,11 @@ main{
 
 
 
-
+// booking card
 .booking-card{
     box-shadow: 0 0 45px rgba(0, 0, 0, .08);
     transition: .5s;
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -231,6 +121,9 @@ main{
 
 
 /*** Food Menu ***/
+.menu-heading{
+    font-family: 'Lato';
+}
 .nav-pills .nav-item .active {
     border-bottom: 2px solid #ee4d2a;
     text-decoration: none;
@@ -255,116 +148,16 @@ main{
 
 
 
-// .testimonial-item {
-//   width: 50% !important;
-// }
-
-
-
-
-
-
-
-
-
-/*** Footer ***/
-.footer .btn.btn-social {
-    margin-right: 5px;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--light);
-    border: 1px solid #FFFFFF;
-    border-radius: 35px;
-    transition: .3s;
+// testiminial heading
+.testimonial-heading{
+    font-family: 'Lato';
 }
-
-.footer .btn.btn-social:hover {
-    color: var(--primary);
-}
-
-.footer .btn.btn-link {
-    display: block;
-    margin-bottom: 5px;
-    padding: 0;
-    text-align: left;
-    color: #FFFFFF;
-    font-size: 15px;
-    font-weight: normal;
-    text-transform: capitalize;
-    transition: .3s;
-}
-
-.footer .btn.btn-link::before {
-    position: relative;
-    content: "\f105";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    margin-right: 10px;
-}
-
-.footer .btn.btn-link:hover {
-    letter-spacing: 1px;
-    box-shadow: none;
-}
-
-.footer .copyright {
-    padding: 25px 0;
-    font-size: 15px;
-    border-top: 1px solid rgba(256, 256, 256, .1);
-}
-
-.footer .copyright a {
-    color: #F1F8FF;
-}
-
-.footer .footer-menu a {
-    margin-right: 15px;
-    padding-right: 15px;
-    border-right: 1px solid rgba(255, 255, 255, .1);
-}
-
-.footer .footer-menu a:last-child {
-    margin-right: 0;
-    padding-right: 0;
-    border-right: none;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.card-dashboard-home{
-    max-width: 450px;
-    box-shadow: 0 0 45px rgba(0, 0, 0, .08);
-    transition: .5s;
-}
-
-
-
-
-
-
 
 
 // order
+.order-heading{
+    font-family: 'Lato';
+}
 .custom-input-field-antd:hover{
     border-color: #ee4d2a !important; 
 }
@@ -373,4 +166,12 @@ main{
 }
 .custom-input-field-antd:focus{
     border-color: #ee4d2a !important;
+}
+
+
+// dashboard
+.card-dashboard-home{
+    max-width: 450px;
+    box-shadow: 0 0 45px rgba(0, 0, 0, .08);
+    transition: .5s;
 }

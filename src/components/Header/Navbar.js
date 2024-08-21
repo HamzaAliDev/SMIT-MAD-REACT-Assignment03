@@ -18,7 +18,7 @@ export default function Navbar() {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top px-4 px-lg-5 py-3 py-lg-1">
             <Link to='home'  className="navbar-brand p-0">
-                <h1 className="text-primary m-0"><i className="fa fa-utensils me-3"></i>FoodHub</h1>
+                <h1 className="text-primary m-0 navbar-brand-name"><i className="fa fa-utensils me-3"></i>FoodHub</h1>
             </Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span className="fa fa-bars"></span>

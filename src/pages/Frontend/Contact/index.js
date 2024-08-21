@@ -60,7 +60,7 @@ export default function Contact() {
                     <div className="container">
                         <div className="text-center">
                             <h5 className="section-title ff-secondary text-center text-primary fw-normal">Contact Us</h5>
-                            <h1 className="mb-5">Contact For Any Query</h1>
+                            <h1 className="mb-5" style={{fontFamily:'Lato'}}>Contact For Any Query</h1>
                         </div>
                         <div className="row g-4">
                             <div className="col-12">

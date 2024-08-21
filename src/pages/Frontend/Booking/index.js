@@ -42,7 +42,7 @@ export default function Booking() {
           <div className="container">
             <div className="text-center ">
               <h5 className="section-title ff-secondary text-center text-primary fw-normal">Your Bookings</h5>
-              <h1 className="mb-5">Your Bookings are Here</h1>
+              <h1 className="mb-5" style={{fontFamily:'Lato'}}>Your Bookings are Here</h1>
             </div>
 
             <div className="row g-4">

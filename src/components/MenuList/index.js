@@ -33,7 +33,7 @@ export default function MenuList() {
         let storedOrders = JSON.parse(localStorage.getItem('Orders')) ||[]
         setOrders(storedOrders)
 
-        let menuList = JSON.parse(localStorage.getItem('MenuList'))
+        let menuList = JSON.parse(localStorage.getItem('MenuList')) || []
         let filteredData = [];
 
         if (activeTab === 'tab-1') {
@@ -89,7 +89,7 @@ export default function MenuList() {
                 <div className="container">
                     <div className="text-center ">
                         <h5 className="section-title ff-secondary text-center text-primary fw-normal">Food Menu</h5>
-                        <h1 className="mb-5">Most Popular Items</h1>
+                        <h1 className="mb-5 menu-heading">Most Popular Items</h1>
                     </div>
                     <div className="tab-class text-center">
                         <ul className="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">

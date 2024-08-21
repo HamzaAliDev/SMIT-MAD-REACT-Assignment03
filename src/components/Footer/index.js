@@ -23,6 +23,7 @@ export default function Footer() {
         e.preventDefault();
 
         let {email} = state
+        if(!email){return toast.error("Enter email")}
         email = email.trim();
 
         if(!email.match(isValidEmail)){return toast.error("Invalid Email")};
@@ -31,8 +32,8 @@ export default function Footer() {
         setUserEmails(updatedUserEmails) 
         localStorage.setItem('UserEmails', JSON.stringify(updatedUserEmails));
 
+        setState({ email: '' });
         toast.success("Email add Successfully!");
-        setState('');
 
     }
 
@@ -72,7 +73,7 @@ export default function Footer() {
                             <h4 className="section-title ff-secondary text-start text-primary fw-normal mb-4">Newsletter</h4>
                             <p>Get the Best from Food Hub. Join Our Foodie Community!</p>
                             <div className="position-relative mx-auto" style={{ maxWidth: '400px' }}>
-                                <input className="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email" name='email' value={state.value} onChange={handleChange} />
+                                <input className="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email" name='email' value={state.email} onChange={handleChange} />
                                 <button type="button" className="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2" onClick={handleSubmit}>Submit</button>
                             </div>
                         </div>
