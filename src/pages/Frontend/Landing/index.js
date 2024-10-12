@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 export default function Landing() {
     const navigate = useNavigate();
     const handleProductBtn = () => {
-        navigate('/auth/login');
+        navigate('/home');
     }
 
     return (
         <main className='landing'>
-            <svg viewBox="0 0 500 150" preserveAspectRatio="none" className='wave-big-screen'><path d="M318.00,-2.44 C443.85,65.63 327.03,116.95 328.15,152.47 L500.00,150.00 L501.41,-5.41 Z" style={{ stroke: 'none', fill: '#ee4d2a' }} ></path></svg>
-            <svg viewBox="0 0 500 150" preserveAspectRatio="none" className='wave-small-screen'><path d="M-2.54,149.52 C66.87,139.64 192.71,-32.05 500.84,147.55 L500.00,0.00 L0.00,0.00 Z" style={{ stroke: 'none', fill: '#ee4d2a' }}></path></svg>
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none" className='wave-big-screen'><path d="M318.00,-2.44 C443.85,65.63 327.03,116.95 328.15,152.47 L500.00,150.00 L501.41,-5.41 Z" style={{ stroke: 'none', fill: '#fb5e2f' }} ></path></svg>
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none" className='wave-small-screen'><path d="M-2.54,149.52 C66.87,139.64 192.71,-32.05 500.84,147.55 L500.00,0.00 L0.00,0.00 Z" style={{ stroke: 'none', fill: '#fb5e2f' }}></path></svg>
             <div className="image-wrapper">
                 <img src={pastaImg} alt="Pasta" className="pasta-img" />
             </div>
@@ -29,7 +29,6 @@ export default function Landing() {
                     <button type="button" className='btn btn-primary btn-products rounded-5 fs-6 px-4 py-2' onClick={handleProductBtn}><span>Set Of Products</span></button>
                 </div>
             </div>
-
         </main>
     )
 }

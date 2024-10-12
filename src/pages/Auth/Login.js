@@ -1,78 +1,85 @@
-import React, { useContext, useState } from 'react'
-import { Card, Input } from 'antd'
+import React, { useState } from 'react'
+import { Button, Card, Input } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import bgImg from '../../../src/assets/pic/bg.jpeg';
-import { AuthContext } from '../../contexts/AuthContext';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { auth } from '../../config/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
-const initialState = {email:'',password:''};
-const storageKey = 'RestaurantUsers';
-const currentUserKey = "RestaurantCurrentUser";
+const initialState = { email: '', password: '' };
+
 export default function Login() {
-    const {dispatch} = useContext(AuthContext);
+    const { dispatch } = useAuthContext()
     const [state, setState] = useState(initialState)
     const [hover, setHover] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false)
     const navigate = useNavigate();
 
-    const handleMouseEnter = () => {
-        setHover(true);
-    };
+    // handle card hover effect.
+    const handleMouseEnter = () =>  setHover(true);
+    const handleMouseLeave = () =>  setHover(false);
 
-    const handleMouseLeave = () => {
-        setHover(false);
-    };
+    // handle state.
+    const handleChange = e => setState(s => ({ ...s, [e.target.name]: e.target.value }))
 
-    const handleChange = (e) => {
-        setState(s =>({...s,[e.target.name]: e.target.value}))
-    }
-
+    // handle login.
     const handleLogin = (e) => {
         e.preventDefault();
         let { email, password } = state;
         email = email.trim();
 
-        let storedUsers = JSON.parse(localStorage.getItem(storageKey)) || [];
+        if (email === '' || password === '') { return window.toastify("All fields are must required", 'error') }
+        if (password.length < 6) { return window.toastify("Password must contain 6 chars", 'error') }
 
-        // check if user exists or password matches
-        let CheckedUser = storedUsers.find(user => user.email === email && user.password === password)
-
-        if (CheckedUser) {
-            localStorage.setItem(currentUserKey, JSON.stringify(CheckedUser));
-            localStorage.setItem('IsAuth', 'true');
-            
-            dispatch({type: 'SET_LOGGED_IN'})
-            toast.success("Login successfully");
-            setState(initialState);
-            navigate('/home');
-
-        } else {
-            toast.error("Invalid email or password.");
-        }
+        setIsProcessing(true);
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                window.toastify("Successfully login", "success")
+                setIsProcessing(false);
+                dispatch({ type: 'SET_LOGGED_IN', payload: { user } })
+                setState(initialState);
+                navigate('/home')
+            })
+            .catch((error) => {
+                console.log("error", error)
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+                        window.toastify("Invalid email and password", 'error'); break;
+                    default:
+                        window.toastify("Something went wrong  while signing", 'error');
+                }
+                setIsProcessing(false);
+            }
+        );
     }
-
 
     return (
         <main className='d-flex justify-content-center align-items-center position-relative'
-            style={{height:'100vh',
-                backgroundImage:`url(${bgImg})`,
-                backgroundSize:'cover',
+            style={{
+                height: '100vh',
+                backgroundImage: `url(${bgImg})`,
+                backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundRepeat:'no-repeat',}} >
+                backgroundRepeat: 'no-repeat',
+            }} >
             <div className="overlay"></div>
-                <Card className='login-register-card' style={{
-                    width: 440,
-                    border: 'none',
-                    boxShadow: hover ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
-                    transition: 'box-shadow 0.3s ease-in-out',
-                    background:'transparent'}}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    <form action="">
+            <Card className='login-register-card' style={{
+                width: 440,
+                border: 'none',
+                boxShadow: hover ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
+                transition: 'box-shadow 0.3s ease-in-out',
+                background: 'transparent'
+            }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <form action="">
                     <div className="row mb-3">
                         <div className="col">
-                            <h1 className='text-center fs-1 fw-semibold' style={{fontFamily:"Courier New"}}>Login</h1>
+                            <h1 className='text-center fs-1 fw-semibold' style={{ fontFamily: "Courier New" }}>Login</h1>
                         </div>
                     </div>
                     <div className="row mb-3">
@@ -86,15 +93,15 @@ export default function Login() {
                         </div>
                     </div>
                     <div className="row px-3">
-                        <button className='btn btn-primary fw-semibold' onClick={handleLogin}>Login</button>
+                        <Button className='btn btn-primary fw-semibold login-btn' size="large" loading={isProcessing} onClick={handleLogin}>Login</Button>
                     </div>
                     <div className="row mt-2">
                         <div className="col">
-                            <p className=' text-center fs-6 fw-semibold' >Don't have an account? <Link to='/auth/register' style={{ color: '#f1733d', textDecoration:'none' }}>Register</Link></p>
+                            <p className=' text-center fs-6 fw-semibold' >Don't have an account? <Link to='/auth/register' style={{ color: '#f1733d', textDecoration: 'none' }}>Register</Link></p>
                         </div>
                     </div>
-                    </form>
-                </Card>
+                </form>
+            </Card>
         </main>
     )
 }

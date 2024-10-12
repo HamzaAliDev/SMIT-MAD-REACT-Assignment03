@@ -6,7 +6,7 @@ import bgImg from './../../assets/pic/bg-hero.jpg'
 export default function HeaderHero() {
     return (
         <header>
-            <div className="container-xxxl py-5 bg-dark hero-header mb-5" style={{
+            <div className="container-xxxl py-2 bg-dark hero-header mb-5" style={{
                 background: `linear-gradient(rgba(15, 23, 43, .9), rgba(15, 23, 43, .9)),url(${bgImg})`
             }}>
                 <div className="container my-5 py-5">
@@ -19,7 +19,7 @@ export default function HeaderHero() {
                             <Link to='/booking' className="btn btn-primary py-sm-3 px-sm-5 me-3 animated slideInLeft">Book A Table</Link>
                         </div>
                         <div className="col-lg-6 text-center text-lg-end overflow-hidden">
-                            <img className="img-fluid" src={heroImg} alt="" style={{maxHeight: 450}}/>
+                            <img className="img-fluid" src={heroImg} alt="" style={{maxHeight: 400}}/>
                         </div>
                     </div>
                 </div>

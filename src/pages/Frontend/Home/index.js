@@ -13,14 +13,11 @@ import client3 from './../../../assets/pic/testimonial-3.jpg';
 import client4 from './../../../assets/pic/testimonial-4.jpg';
 import Reservation from '../../../components/Reservation';
 
-
-
-
 export default function Home() {
-  
+
   const contentStyle = {
     height: '160px',
-    color: '#fff',
+    color: '#fb8500',
     lineHeight: '160px',
     textAlign: 'center',
     background: '#364d79',
@@ -80,16 +77,16 @@ export default function Home() {
               <div className="col-lg-6">
                 <div className="row g-3">
                   <div className="col-6 text-start">
-                    <img className="img-fluid rounded w-100 "  src={about1} alt='' />
+                    <img className="img-fluid rounded w-100 " src={about1} alt='' />
                   </div>
                   <div className="col-6 text-start">
-                    <img className="img-fluid rounded w-75 "  src={about2} alt='' style={{ marginTop: "25%" }} />
+                    <img className="img-fluid rounded w-75 " src={about2} alt='' style={{ marginTop: "25%" }} />
                   </div>
                   <div className="col-6 text-end">
-                    <img className="img-fluid rounded w-75 "  src={about3} alt='' />
+                    <img className="img-fluid rounded w-75 " src={about3} alt='' />
                   </div>
                   <div className="col-6 text-end">
-                    <img className="img-fluid rounded w-100 "  src={about4} alt='' />
+                    <img className="img-fluid rounded w-100 " src={about4} alt='' />
                   </div>
                 </div>
               </div>
@@ -97,10 +94,10 @@ export default function Home() {
                 <h5 className="section-title ff-secondary text-start text-primary fw-normal">About Us</h5>
                 <h1 className="mb-4 ">Welcome to <i className="fa fa-utensils text-primary me-2"></i><span className='about-name-project'>FoodHub</span></h1>
                 <p className="mb-4">Your premier destination for an unforgettable dining experience. At FoodHub,we believe in the art of
-                                culinary excellence, where our talented chefs meticulously craft each dish using the finest, freshest ingredients.</p>
+                  culinary excellence, where our talented chefs meticulously craft each dish using the finest, freshest ingredients.</p>
                 <p className="mb-4">Our menu offers a delightful fusion of traditional and contemporary flavors, catering to diverse palates. The warm,
-                               inviting ambiance of our restaurant ensures a comfortable and enjoyable setting for all occasions, whether it's a casual meal or a special celebration.
-                               Join us at FoodHub and embark on a gastronomic journey that promises to tantalize your taste buds and leave you with cherished memories.</p>
+                  inviting ambiance of our restaurant ensures a comfortable and enjoyable setting for all occasions, whether it's a casual meal or a special celebration.
+                  Join us at FoodHub and embark on a gastronomic journey that promises to tantalize your taste buds and leave you with cherished memories.</p>
                 <div className="row g-4 mb-4">
                   <div className="col-sm-6">
                     <div className="d-flex align-items-center border-start border-5 border-primary px-3">
@@ -141,48 +138,51 @@ export default function Home() {
             </div>
             <div className='d-flex justify-content-center'>
               <div className=" testimonial-carousel w-50">
-                <Carousel autoplay>
-                  <div className="testimonial-item bg-transparent border rounded p-4" style={{ width: '50%' }}>
+                <Carousel autoplay dotStyle={{ color: 'orange !important' }} activeDotStyle={{ color: 'red' }} >
+                  <div className="testimonial-item bg-transparent border rounded p-4" style={{ width: '70%' }}>
                     <i className="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                    <p>Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
+                    <p style={{ textAlign: "justify" }}>FoodHub is a hidden gem! The menu is diverse, and every dish I tried was delicious. The staff is friendly, and the ambiance
+                      is perfect for a cozy evening. I highly recommend their signature pasta—it’s a must-try!</p>
                     <div className="d-flex align-items-center">
                       <img className="img-fluid flex-shrink-0 rounded-circle" src={client1} alt='' style={{ width: "50px", height: "50px" }} />
                       <div className="ps-3">
-                        <h5 className="mb-1">Client Name</h5>
-                        <small>Profession</small>
+                        <h5 className="mb-1">Emily Roberts</h5>
+                        <small>Food Blogger</small>
                       </div>
                     </div>
                   </div>
                   <div className="testimonial-item bg-transparent border rounded p-4" style={contentStyle}>
                     <i className="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                    <p>Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
+                    <p style={{ textAlign: "justify" }}>I recently hosted a small event at FoodHub, and I must say, the experience was exceptional. The staff went above and beyond to accommodate our needs,
+                      and the food was impeccable. FoodHub is now my go-to place for client meetings!</p>
                     <div className="d-flex align-items-center">
                       <img className="img-fluid flex-shrink-0 rounded-circle" src={client2} alt='' style={{ width: "50px", height: "50px" }} />
                       <div className="ps-3">
-                        <h5 className="mb-1">Client Name</h5>
-                        <small>Profession</small>
+                        <h5 className="mb-1"> Michael Johnson</h5>
+                        <small>Event Planner</small>
                       </div>
                     </div>
                   </div>
                   <div className="testimonial-item bg-transparent border rounded p-4">
                     <i className="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                    <p>Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
-                    <div className="d-flex align-items-center">
-                      <img className="img-fluid flex-shrink-0 rounded-circle" src={client3} alt='' style={{ width: "50px", height: "50px" }} />
-                      <div className="ps-3">
-                        <h5 className="mb-1">Client Name</h5>
-                        <small>Profession</small>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="testimonial-item bg-transparent border rounded p-4">
-                    <i className="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                    <p>Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
+                    <p style={{ textAlign: "justify" }}>FoodHub has nailed the balance between great food and outstanding service. Whether it’s a quick lunch or a formal dinner, they always deliver an amazing experience.
+                      The grilled salmon is one of the best I’ve had!</p>
                     <div className="d-flex align-items-center">
                       <img className="img-fluid flex-shrink-0 rounded-circle" alt='' src={client4} style={{ width: "50px", height: "50px" }} />
                       <div className="ps-3">
-                        <h5 className="mb-1">Client Name</h5>
-                        <small>Profession</small>
+                        <h5 className="mb-1">Sarah Thompson</h5>
+                        <small>Business Consultant</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="testimonial-item bg-transparent border rounded p-4">
+                    <i className="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                    <p style={{ textAlign: "justify" }}>I love how FoodHub caters to various dietary needs without compromising on flavor. As a nutritionist, I appreciate the healthy options on the menu, and their salads are simply fantastic. Highly recommend for health-conscious diners!</p>
+                    <div className="d-flex align-items-center">
+                      <img className="img-fluid flex-shrink-0 rounded-circle" src={client3} alt='' style={{ width: "50px", height: "50px" }} />
+                      <div className="ps-3">
+                        <h5 className="mb-1">James Peterson</h5>
+                        <small>Nutritionist</small>
                       </div>
                     </div>
                   </div>

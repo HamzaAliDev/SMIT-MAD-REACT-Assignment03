@@ -102,16 +102,18 @@ export default function Profile() {
                                     <div className="col-lg-6">
                                         <Card hoverable>
                                             <div className="card-body">
-                                                <h4 className='card-title text-primary' style={{fontFamily:'Lato'}}>Profile Card</h4>
+                                                <h4 className='card-title' style={{fontFamily:'Lato'}}>Profile Card</h4>
                                                 <div style={{ textAlign: 'left',fontFamily:'Lato' }}>
-                                                    <i className="fa fs-4 fa-user text-primary ms-3 mt-4 text-left"></i>
-                                                    <span className='fs-5 fw-semibold ms-4 '>{currentUser.fullName}</span><br />
-                                                    <i className='fa fs-4 fa-receipt text-primary ms-3 mt-4'></i>
-                                                    <span className='fs-5 fw-semibold ms-4' onClick={() => showModal('current-order')}>Current Order</span><br />
-                                                    <i className='fa fs-4 fa-list-alt text-primary ms-3 mt-4'></i>
-                                                    <span className='fs-5 fw-semibold ms-3' onClick={() => showModal('order-history')}>Order History</span><br />
-                                                    <i className='fa fs-4 fa-user-edit text-primary ms-3 mt-4'></i>
-                                                    <span className='fs-5 fw-semibold ms-3' onClick={() => showModal('update-profile')}>Update Profile</span><br />
+                                                    <i className="fa fs-4 fa-user text-secondary ms-3 mt-4 text-left"></i>
+                                                    <span className='fs-5 ms-4 '>{currentUser.fullName}</span><br />
+                                                    <i className='fa fs-4 fa-receipt text-secondary ms-3 mt-4'></i>
+                                                    <span className='fs-5 profile-card-menu  ms-4' onClick={() => showModal('current-order')}>Current Order</span><br />
+                                                    <i className='fa fs-4 fa-list-alt text-secondary ms-3 mt-4'></i>
+                                                    <span className='fs-5 profile-card-menu  ms-3' onClick={() => showModal('order-history')}>Order History</span><br />
+                                                    <i className='fa fs-4 fa-list-alt text-secondary ms-3 mt-4'></i>
+                                                    <span className='fs-5 profile-card-menu  ms-3' onClick={() => showModal('order-history')}>Booking History</span><br />
+                                                    <i className='fa fs-4 fa-user-edit text-secondary ms-3 mt-4'></i>
+                                                    <span className='fs-5 profile-card-menu ms-3' onClick={() => showModal('update-profile')}>Update Profile</span><br />
                                                 </div>
                                             </div>
 

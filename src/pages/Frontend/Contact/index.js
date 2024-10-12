@@ -1,56 +1,65 @@
-import React, {useState , useEffect} from 'react'
+import React, { useState } from 'react'
 import HeaderOther from '../../../components/Header/HeaderOther';
-import { toast } from 'react-toastify';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { firestore } from '../../../config/firebase';
+import { Button } from 'antd';
 
-const initialState = {name:'', email:'', subject:'', message:''};
+const initialState = { name: '', email: '', subject: '', message: '' };
 const isValidEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-const uniqueId = () => Math.random().toString(36).slice(4);
 
 export default function Contact() {
-    const [state,setState] = useState(initialState);
-    const [messages, setMessages] = useState([]);
+    const { isAuthenticated, user } = useAuthContext();
+    const [state, setState] = useState(initialState);
+    const [isProcessing, setIsProcessing] = useState(false)
+    const navigate = useNavigate();
 
-    
-    // Load users from local storage when the component mounts
-    useEffect(() => {
-        const storedMessages = localStorage.getItem('Messages');
-        if (storedMessages) {
-            setMessages(JSON.parse(storedMessages));
-        }
-    }, []);
+    // handle state change
+    const handleChange = e => setState(s => ({ ...s, [e.target.name]: e.target.value }))
 
-
-    const handleChange = (e) => {
-        setState(s => ({...s,[e.target.name]: e.target.value}))
-    }
-
-    const handleMessage = (e) => {
+    // handle message
+    const handleMessage = async (e) => {
         e.preventDefault();
-        let {name, email, subject, message} = state;
+
+        if (!isAuthenticated) { window.toastify("Please Login", "info"); return navigate('/auth/login') }
+
+        let { name, email, subject, message } = state;
         name = name.trim()
         email = email.trim()
-    
-        if(name === "" || email === "" || subject === '' || message === ''){ return toast.error("All fields are must required")};
-        if(name.length < 3){return toast.error("Enter correct username")};
-        if(!email.match(isValidEmail)){return toast.error("Invalid Email")};  
-        
+
+        if (name === "" || email === "" || subject === '' || message === '') { return window.toastify("All fields are must required", "error") };
+        if (name.length < 3) { return window.toastify("Enter correct username", 'error') };
+        if (!email.match(isValidEmail)) { return window.toastify("Invalid Email", 'error') };
+
         let msg = {
+            userId: user.id,
             name,
             email,
             subject,
             message,
-            addDate: new Date(),
-            id:uniqueId(),
+            addDate: serverTimestamp(),
         }
+        setIsProcessing(true)
 
-        const updatedMessages = [...messages, msg];
-        setMessages(updatedMessages);
-        localStorage.setItem('Messages', JSON.stringify(updatedMessages));
+        try {
+            // Create a new document reference with an auto-generated ID
+            const newDocRef = doc(collection(firestore, "Feedback"));
+            // Get the generated document ID
+            const documentId = newDocRef.id;
+            await setDoc(newDocRef, {
+                ...msg,
+                feedbackId: documentId,  // Include the ID in the document data
+            });
 
-        toast.success("Added Message Successfully!");
-        setState(initialState);
+            window.toastify("Feedback Added Successfully", "success")
+            setState(initialState);
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            window.toastify("Something went wrong while sending feedback", "error")
+        }
+        setIsProcessing(false)
     }
-
 
     return (
         <>
@@ -60,7 +69,7 @@ export default function Contact() {
                     <div className="container">
                         <div className="text-center">
                             <h5 className="section-title ff-secondary text-center text-primary fw-normal">Contact Us</h5>
-                            <h1 className="mb-5" style={{fontFamily:'Lato'}}>Contact For Any Query</h1>
+                            <h1 className="mb-5" style={{ fontFamily: 'Lato' }}>Contact For Any Query</h1>
                         </div>
                         <div className="row g-4">
                             <div className="col-12">
@@ -114,7 +123,7 @@ export default function Contact() {
                                                 </div>
                                             </div>
                                             <div className="col-12">
-                                                <button className="btn btn-primary w-100 py-3" type="submit" onClick={handleMessage}>Send Message</button>
+                                                <Button className="btn btn-primary w-100 " size='large' loading={isProcessing} type="submit" onClick={handleMessage}>Send Message</Button>
                                             </div>
                                         </div>
                                     </form>

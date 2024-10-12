@@ -12,7 +12,7 @@ export default function Service() {
                         <div className="container">
                             <div className="text-center">
                                 <h5 className="section-title ff-secondary text-center text-primary fw-normal">Our Services</h5>
-                                <h1 className="mb-5">Explore Our Services</h1>
+                                <h1 className="mb-5" style={{fontFamily: "Lato"}}>Explore Our Services</h1>
                             </div>
                             <div className="row g-4">
                                 <div className="col-lg-3 col-sm-6">
@@ -20,7 +20,7 @@ export default function Service() {
                                         <div className="p-4">
                                             <i className="fa fa-3x fa-user-tie text-primary mb-4"></i>
                                             <h5>Master Chefs</h5>
-                                            <p>Diam elitr kasd sed at elitr sed ipsum justo dolor sed clita amet diam</p>
+                                            <p style={{fontFamily: "Playwrite+DE+Grund"}}>Diam elitr kasd sed at elitr sed ipsum justo dolor sed clita amet diam</p>
                                         </div>
                                     </div>
                                 </div>
@@ -74,7 +74,7 @@ export default function Service() {
                                         <div className="p-4">
                                             <i className="fa fa-3x fa-calendar-check  text-primary mb-4"></i>
                                             <h5>Events</h5>
-                                            <p>Host your special occasions with us for a memorable celebration, tailored to your needs.</p>
+                                            <p>Host your special occasions with us for a memorable celebration to your needs.</p>
                                         </div>
                                     </div>
                                 </div>

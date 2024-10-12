@@ -1,22 +1,33 @@
+$pColor: #fb8500;
 
 .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 43, .6); /* Adjust opacity and color as needed */
-    z-index: 1;
-  }
-  
-  form {
-    position: relative;
-    z-index: 2;
-  }
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 43, .6);
+  /* Adjust opacity and color as needed */
+  z-index: 1;
+}
 
-  @media (max-width: 440px) {
-        .login-register-card{
-            width: 330px;
-        }
-  }
+form {
+  position: relative;
+  z-index: 2;
+}
 
+.register-btn:hover {
+  color: $pColor !important;
+  border-color: $pColor !important;
+}
+
+.login-btn:hover {
+  color: $pColor !important;
+  border-color: $pColor !important;
+}
+
+@media (max-width: 440px) {
+  .login-register-card {
+    width: 330px;
+  }
+}

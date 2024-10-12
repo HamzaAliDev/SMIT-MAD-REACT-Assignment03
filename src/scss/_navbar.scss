@@ -1,11 +1,13 @@
-// navbar
-.navbar-brand-name{
+$pColor: #fb8500;
+
+.navbar-brand-name {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: 600;
 }
+
 .navbar-dark .navbar-nav .nav-link {
     position: relative;
-    margin-left: 25px;
+    margin-left: 20px;
     padding: 35px 0;
     font-size: 15px;
     color: #F1F8FF !important;
@@ -13,7 +15,7 @@
     font-weight: 500;
     outline: none;
     transition: .5s;
-    
+
 }
 
 .sticky-top.navbar-dark .navbar-nav .nav-link {
@@ -22,7 +24,7 @@
 
 .navbar-dark .navbar-nav .nav-link:hover,
 .navbar-dark .navbar-nav .nav-link.active {
-    color: #ee4d2a !important;
+    color: $pColor !important;
 }
 
 .navbar-dark .navbar-brand img {
@@ -63,7 +65,7 @@
         z-index: 999;
         background: transparent !important;
     }
-    
+
     .sticky-top.navbar-dark {
         position: fixed;
         background: #0F172B !important;
@@ -72,23 +74,21 @@
 
 
 .dropdown-menu-header {
-    display: none; 
-    position: absolute; 
-    // top: 80%; 
-    // right: 0; 
+    display: none;
+    position: absolute;
     background-color: whitesmoke;
     padding-left: 12px;
-       
 }
-  
-.dropdown-menu-header.visible { 
-    display: block; 
+
+.dropdown-menu-header.visible {
+    display: block;
 }
-.dropdown-menu-header .dropdown-link{
+
+.dropdown-menu-header .dropdown-link {
     text-decoration: none;
     color: black;
 }
-.dropdown-menu-header .dropdown-link:hover {
-    color: #ee4d2a;
-}
 
+.dropdown-menu-header .dropdown-link:hover {
+    color: $pColor;
+}

@@ -1,39 +1,54 @@
-import React, {useState, useEffect} from 'react';
-import { toast } from 'react-toastify';
+import React, {useState} from 'react';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { firestore } from '../../config/firebase';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const isValidEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 export default function Footer() {
+    const {isAuthenticated, user} = useAuthContext();
     const [state, setState] = useState('');
-    const [userEmails, setUserEmails] = useState([])
+    const navigate = useNavigate();
     let year = new Date().getFullYear();
 
-    // Load users from local storage when the component mounts
-    useEffect(() => {
-        const storedUserEmails = localStorage.getItem('UserEmails');
-        if (storedUserEmails) {
-            setUserEmails(JSON.parse(storedUserEmails));
-        }
-    }, []);
-
+    // handle state changes
     const handleChange = (e) => {
         setState(s => ({...s,[e.target.name]: e.target.value}))
     }
 
-    const handleSubmit = (e) => {
+    // handle submit
+    const handleSubmit = async(e) => {
         e.preventDefault();
 
+        if (!isAuthenticated) { window.toastify("Please Login", "info"); return navigate('/auth/login') }
+
         let {email} = state
-        if(!email){return toast.error("Enter email")}
+        if(!email){return window.toastify("Enter email",'error')}
         email = email.trim();
 
-        if(!email.match(isValidEmail)){return toast.error("Invalid Email")};
+        if(!window.isEmail(email)){return  window.toastify("Invalid Email",'error')}
         
-        const updatedUserEmails = [...userEmails, email];
-        setUserEmails(updatedUserEmails) 
-        localStorage.setItem('UserEmails', JSON.stringify(updatedUserEmails));
+        try {
+            // Create a new document reference with an auto-generated ID
+            const newDocRef = doc(collection(firestore, "Emails"));
 
-        setState({ email: '' });
-        toast.success("Email add Successfully!");
+            // Get the generated document ID
+            const documentId = newDocRef.id;
+
+            // Set the document data with the document ID included
+            await setDoc(newDocRef, {
+                email,
+                userId: user.id,
+                createdAt: serverTimestamp(),
+                emailId: documentId,  // Include the ID in the document data
+            });
+
+            window.toastify("Email Added Successfully", "success");
+            setState(' ');
+
+        } catch (error) {
+            console.error("Error adding email: ", error);
+            window.toastify("Something went wrong while adding Email", "error");
+        }
 
     }
 
@@ -74,7 +89,7 @@ export default function Footer() {
                             <p>Get the Best from Food Hub. Join Our Foodie Community!</p>
                             <div className="position-relative mx-auto" style={{ maxWidth: '400px' }}>
                                 <input className="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email" name='email' value={state.email} onChange={handleChange} />
-                                <button type="button" className="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2" onClick={handleSubmit}>Submit</button>
+                                <button type="button" className="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2"  onClick={handleSubmit}>Submit</button>
                             </div>
                         </div>
                     </div>

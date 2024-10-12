@@ -3,15 +3,22 @@ import ReactDOM from 'react-dom/client';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import App from './App';
+import '../src/config/global';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
 import AuthContextProvider from './contexts/AuthContext';
+import MenuProvider  from './contexts/MenuContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthContextProvider>
-      <App />
-    </AuthContextProvider>
+    <BrowserRouter>
+      <AuthContextProvider>
+        <MenuProvider>
+          <App />
+        </MenuProvider>
+      </AuthContextProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
