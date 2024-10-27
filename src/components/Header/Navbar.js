@@ -1,13 +1,16 @@
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export default function Navbar() {
-    const { handleLogout } = useAuthContext()
+    const { handleLogout, isAuthenticated } = useAuthContext()
+    const navigate = useNavigate()
 
     // handle logout
     const handleLogOut = () => {
         handleLogout();
+        window.toastify("Successfully Logout","success")
+        navigate('/')
     }
 
     return (
@@ -36,8 +39,12 @@ export default function Navbar() {
 
                     </div>
                 </div>
-                <NavLink to='auth/login' className="btn btn-outline-primary py-1 rounded-5 me-3 fw-semibold">sign In</NavLink>
-                <Link to='auth/register' className="btn btn-primary py-1 rounded-5 fw-semibold">sign Up</Link>
+                {!isAuthenticated &&
+                    <>
+                        <NavLink to='auth/login' className="btn btn-outline-primary py-1 rounded-5 me-3 fw-semibold">sign In</NavLink>
+                        <Link to='auth/register' className="btn btn-primary py-1 rounded-5 fw-semibold">sign Up</Link>
+                    </>
+                }
             </div>
         </nav>
     )

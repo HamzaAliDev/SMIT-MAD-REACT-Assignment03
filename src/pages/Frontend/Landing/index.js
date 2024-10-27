@@ -26,7 +26,7 @@ export default function Landing() {
             </div>
             <div className="row">
                 <div className="col">
-                    <button type="button" className='btn btn-primary btn-products rounded-5 fs-6 px-4 py-2' onClick={handleProductBtn}><span>Set Of Products</span></button>
+                    <button type="button" className='btn btn-primary btn-products rounded-5 fs-6 px-4 py-2' onClick={handleProductBtn}><span>Explore Now</span></button>
                 </div>
             </div>
         </main>

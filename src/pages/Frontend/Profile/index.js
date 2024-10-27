@@ -1,50 +1,121 @@
 import React, { useEffect, useState } from 'react'
-import HeaderOther from '../../../components/Header/HeaderOther'
-import { Card, Input, Modal } from 'antd'
+import { Button, Card, Input, Modal, Table, Tag } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import { toast } from 'react-toastify';
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { firestore, storage } from '../../../config/firebase';
+import { useMenuContext } from '../../../contexts/MenuContext';
+import moment from 'moment';
 
-const initialState = {fullName: '', oldPassword: '', newPassword:''}
+const initialState = { fullName: '' }
 export default function Profile() {
     const [state, setState] = useState(initialState)
-    const [currentUser, setCurrentUser] = useState({});
     const [orders, setOrders] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalSelection, setModalSelection] = useState('')
+    const [loading, setLoading] = useState(false);
+    const { user, handleLogout, updateProfile } = useAuthContext();
+    const { menuItems } = useMenuContext();
+    const [tableBookings, setTableBookings] = useState([]);
+    const [profileImg, setProfileImg] = useState('');
 
-   // Initialize OrderHistory only if it doesn't exist
-   useEffect(() => {
-    if (!localStorage.getItem('OrderHistory')) {
-        localStorage.setItem('OrderHistory', JSON.stringify([]))
+
+    const loadDataOrderHistory = async () => {
+        const q = query(collection(firestore, "Order-History"), where("userId", "==", user.id));
+        const ordersHistory = [];
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            // console.log(doc.id, " => ", doc.data());
+            ordersHistory.push(doc.data())
+
+        });
+        setOrders(ordersHistory)
     }
-}, [])
 
-    const loadData = () => {
-        const user = JSON.parse(localStorage.getItem('RestaurantCurrentUser'))
-        setCurrentUser(user)
+    const loadDataTableBookings = async () => {
+        const q = query(collection(firestore, "Table-Bookings"), where("userId", "==", user.id));
+        const bookingHistory = [];
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            // console.log(doc.id, " => ", doc.data());
+            bookingHistory.push(doc.data())
+
+        });
+        setTableBookings(bookingHistory)
     }
     useEffect(() => {
-        loadData();
+        loadDataOrderHistory();
+        loadDataTableBookings();
     }, [])
 
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
+        const storageRef = ref(storage, 'profile-images/' + file.name);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+            },
+            (error) => {
+                // setConfirmLoading(false)
+                console.error("error", error)
+                window.toastify("Something went wrong while add img", 'error')
+                // Handle unsuccessful uploads
+            },
+            async () => {
+                // Handle successful uploads on complete
+                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    // console.log('File available at', downloadURL);
+                    updateUserProfile(downloadURL);
+
+                });
+
+            }
+        );
+    }
+
+    const updateUserProfile = async(url) => {
+        try {
+            // Update Firestore with the new profile image URL
+        const userRef = doc(firestore, "users", user.id);
+        await updateDoc(userRef, { profileImgUrl: url });
+
+       const updateProfileData = {
+         profileImgUrl : url,
+       }
+       await updateProfile(updateProfileData)
+
+        } catch (error) {
+            console.error("error", error)
+            window.toastify("Something went wrong while adding Image",'error')
+        }
+        
+    }
     const showModal = (value) => {
         setIsModalOpen(true);
 
-        if (value === 'current-order') {
-            const confirmedOrders = JSON.parse(localStorage.getItem('ConfirmedOrders')) || []
-            const filterOrders = confirmedOrders.filter(order => order.userId === currentUser.id)
-            setOrders(filterOrders)
+        if (value === 'booking-history') {
             setModalSelection(value)
+            // getBookingHistory();
         } else if (value === "update-profile") {
             setModalSelection(value)
         } else {
             setModalSelection(value)
-            const orderHistory = JSON.parse(localStorage.getItem('OrderHistory')) || []
-            const filterHistory = orderHistory.filter(o => o.userId === currentUser.id)
-            // console.log("filterHistory",filterHistory)
-            setOrders(filterHistory)
+            // getOrderHistory();
         }
     };
     const handleOk = () => {
@@ -55,126 +126,194 @@ export default function Profile() {
     };
 
 
-    const handleChange = (e) => {
-        setState(s => ({...s,[e.target.name]: e.target.value}) )
-    }
-    const handleUpdate = (e) => {
-        e.preventDefault();
-        let { fullName ,oldPassword, newPassword } = state
-        fullName = fullName.trim()
-    
-        if(fullName === "" || oldPassword === "" || newPassword === ''){ return toast.error("All fields are must required")}
-        if(fullName.length < 3){return toast.error("Enter correct username")} 
-        if(oldPassword.length < 6 || newPassword.length < 6){return toast.warning("Password must be 6 characters")}
-        if(oldPassword !== currentUser.password){return toast.error("Incorrect Old Password")}
+    const handleChange = (e) => setState(s => ({ ...s, [e.target.name]: e.target.value }))
 
-        
-        let updatedUser = {
-            ...currentUser,
-            fullName,
-            password: newPassword
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+
+        let { fullName } = state
+        fullName = fullName.trim()
+
+        if (fullName === "") { return window.toastify("All fields are must required", 'error') }
+        if (fullName.length < 3) { return window.toastify("Enter correct username", 'error') }
+
+        setLoading(true)
+        try {
+            // Update Firestore
+            const userRef = doc(firestore, "users", user.id);
+            await updateDoc(userRef, { fullName });
+
+            // Update local storage (optional if you use local storage for this purpose)
+
+            // Update state to re-render with new data
+            window.toastify("Profile updated successfully!", 'success');
+            user.fullName = fullName;
+
+            // Reset form and close modal
+            setState(initialState);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            window.toastify("Something went wrong while updating the profile",'error');
+        } finally {
+            setLoading(false);
         }
 
-        localStorage.setItem('RestaurantCurrentUser', JSON.stringify(updatedUser))
-
-         // Update the user in RestaurantUsers
-         const userList = JSON.parse(localStorage.getItem('RestaurantUsers')) || [];
-         const updatedUsers = userList.map(user => user.id === currentUser.id ? updatedUser : user);
-         localStorage.setItem('RestaurantUsers', JSON.stringify(updatedUsers));
- 
-         toast.success("Profile updated successfully!");
-         setState(initialState);
-         loadData();
-         setIsModalOpen(false);
+        setState(initialState);
+        // loadData();
+        setIsModalOpen(false);
     }
+
+    const columns = [
+        { title: 'St#', dataIndex: 'num', key: 'num' },
+        { title: 'pic Items Quantity', dataIndex: 'pic_items_quantity', key: 'pic_items_quantity', },
+        { title: 'Total', dataIndex: 'total', key: 'total', },
+        { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt', },
+        {
+            title: 'Status', dataIndex: 'status', key: 'status',
+            render: (_, { status }) => {
+                // Determine the color based on the length of the status 
+                let color = status.length < 10 ? 'yellow' : 'red';
+
+                return (
+                    <Tag color={color} key={status}>
+                        {status.toUpperCase()}
+                    </Tag>
+                );
+            }
+        },
+    ];
+
+    // data on table
+    const data = orders.map((u, i) => {
+        let totalPrice = 0;
+        // Create ordered list for the items using the item name and quantity
+        const itemsList = (
+            <ol>
+                {u.order && u.order.map((item) => {
+                    const menuItem = menuItems.find((menu) => menu.itemId === item.itemId) || {};
+
+                    // Extract `title` and `price` from the found menu item
+                    const { title = "Unknown Item", price = '0', imgUrl = '' } = menuItem;
+
+                    // Calculate the item total price
+                    const itemTotal = parseFloat(price) * item.quantity || 1;
+                    totalPrice += itemTotal // Update the total price
+
+
+                    return (
+                        <li key={item.itemId} className='mb-2'>
+                            <img src={imgUrl} className='rounded-3' alt="image" style={{ width: 50, height: 50 }} /> {title} (Quantity: {item.quantity})
+                        </li>
+                    );
+                })}
+            </ol>
+        );
+
+        return {
+            key: i + 1,
+            num: i + 1,
+            pic_items_quantity: itemsList,
+            total: totalPrice.toFixed(2),
+            createdAt: u.createdAt ? moment(u.createdAt.seconds * 1000).format('YYYY-MM-DD h:mm:ss a') : 'N/A',
+            status: u.status,
+        }
+    });
+
+
+    const TableDataColumns = [
+        { title: 'St#', dataIndex: 'num', key: 'num' },
+        { title: 'Name', dataIndex: 'fullName', key: 'fullName', },
+        { title: 'Persons', dataIndex: 'person', key: 'person', },
+        { title: 'Reserved Time', dataIndex: 'reservedTime', key: 'reservedTime', },
+        { title: 'Special Request', dataIndex: 'request', key: 'request', },
+        {
+            title: 'Status', dataIndex: 'status', key: 'status',
+            render: (_, { status }) => {
+                // Determine the color based on the length of the status 
+                let color = status.length < 7 ? 'geekblue' : 'green';
+
+                return (
+                    <Tag color={color} key={status}>
+                        {status.toUpperCase()}
+                    </Tag>
+                );
+            }
+        },
+    ];
+
+    const TableData = tableBookings.map((u, i) => {
+        return {
+            key: i + 1,
+            num: i + 1,
+            fullName: u.fullName,
+            person: u.noOfPeople,
+            reservedTime: u.reservedTime ? moment(u.reservedTime).format('YYYY-MM-DD h:mm:ss a') : 'N/A',
+            request: u.request,
+            status: u.status,
+        }
+    });
 
     return (
         <>
-            <HeaderOther title='Profile' />
-            <main>
+            {/* <HeaderOther title='Profile' /> */}
+            <main className='pt-5'>
                 <div className="container-xxxl bg-white p-0">
                     <div className="container-xxl py-5">
                         <div className="container">
                             <div className="text-center">
                                 <h5 className="section-title ff-secondary text-center text-primary fw-normal">User Profile</h5>
-                                <h1 className="mb-5" style={{fontFamily:'Lato'}}>Your Profile</h1>
-                                <div className="row d-flex  justify-content-center">
-                                    <div className="col-lg-6">
-                                        <Card hoverable>
-                                            <div className="card-body">
-                                                <h4 className='card-title' style={{fontFamily:'Lato'}}>Profile Card</h4>
-                                                <div style={{ textAlign: 'left',fontFamily:'Lato' }}>
-                                                    <i className="fa fs-4 fa-user text-secondary ms-3 mt-4 text-left"></i>
-                                                    <span className='fs-5 ms-4 '>{currentUser.fullName}</span><br />
-                                                    <i className='fa fs-4 fa-receipt text-secondary ms-3 mt-4'></i>
-                                                    <span className='fs-5 profile-card-menu  ms-4' onClick={() => showModal('current-order')}>Current Order</span><br />
-                                                    <i className='fa fs-4 fa-list-alt text-secondary ms-3 mt-4'></i>
-                                                    <span className='fs-5 profile-card-menu  ms-3' onClick={() => showModal('order-history')}>Order History</span><br />
-                                                    <i className='fa fs-4 fa-list-alt text-secondary ms-3 mt-4'></i>
-                                                    <span className='fs-5 profile-card-menu  ms-3' onClick={() => showModal('order-history')}>Booking History</span><br />
-                                                    <i className='fa fs-4 fa-user-edit text-secondary ms-3 mt-4'></i>
-                                                    <span className='fs-5 profile-card-menu ms-3' onClick={() => showModal('update-profile')}>Update Profile</span><br />
-                                                </div>
-                                            </div>
+                                <h1 className="mb-5" style={{ fontFamily: 'Lato' }}>Your Profile</h1>
+                            </div>
+                            <div className="profile-header">
+                                <div className='profile-img-container'>
+                                    {user.profileImgUrl ? (
+                                        <img src={user.profileImgUrl} alt="Profile Picture" className="profile-picture" />
+                                    ) : (
+                                        <i className="fa fs-4 fa-user text-secondary profile-picture-icon"></i>
+                                    )}
 
-                                        </Card>
-                                    </div>
+                                    <label htmlFor="fileInput" className="edit-icon">
+                                        <i className="fa fa-camera text-secondary"></i>
+                                    </label>
 
+                                    <input type="file" id="fileInput" className="file-input" accept="image/*" name="profileImg"  onChange={handleImageUpload} />
+                                </div>
+                                <div className='ms-4 pt-4'>
+                                    <h1 className="username">{user.fullName}</h1>
+                                    <p className="bio">Passionate about good food and great experiences.</p>
                                 </div>
                             </div>
-                            <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                                {modalSelection === 'current-order' &&
-                                    orders.map((order, i) => (
-                                        <Card key={i} hoverable className='mb-3' >
-                                            <div className='d-flex flex-row flex-wrap align-items-center justify-content-between'>
-                                                <div className="col mb-2">
-                                                    <div className="d-flex align-items-center">
-                                                        <img className="flex-shrink-0 img-fluid rounded" src={order.pic} alt="" style={{ width: '80px' }} />
-                                                        <div className="w-100 d-flex flex-column text-start ps-4">
-                                                            <h5 className="d-flex justify-content-between border-bottom pb-2">
-                                                                <span>{order.name}</span>
-                                                                <span className="text-primary">${order.price}</span>
-                                                            </h5>
-                                                            <small className=" d-flex justify-content-between">
-                                                                <span className='fst-italic'>Quantity: {order.quantity}</span>
-                                                                <span className='fst-italic'>{dayjs(order.CreatedDate).format('MMMM D, YYYY')}</span>
-                                                            </small>
+                            <div className='text-center'>
+                                <button className='btn btn-outline-primary px-4 py-2 m-3 rounded-5 profile-btn' onClick={() => showModal('order-history')}>Order History</button>
+                                <button className='btn btn-outline-primary px-4 py-2 m-3 rounded-5 profile-btn' onClick={() => showModal('booking-history')}>Booking History</button>
+                                <button className='btn btn-outline-primary px-4 py-2 m-3 rounded-5 profile-btn' onClick={() => showModal('update-profile')}>Update Profile</button>
+                                <button className='btn btn-outline-primary px-4 py-2 m-3 rounded-5 profile-btn' onClick={() => handleLogout()}>Logout</button>
+                            </div>
 
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-
-                                    )) }
+                            <Modal title="" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={modalSelection === 'order-history' || modalSelection === 'booking-history' ? 1000 : undefined}>
+                                {modalSelection === 'booking-history' &&
+                                    <>
+                                        <div className='row heading m-5'>
+                                            <h2 className='text-center'>Booking History</h2>
+                                        </div>
+                                        <div className='table-responsive'>
+                                            <Table columns={TableDataColumns} dataSource={TableData} />
+                                        </div>
+                                    </>
+                                }
                                 {modalSelection === 'order-history' &&
-                                    orders.map((order, i) => (
-                                        <Card key={i} hoverable className='mb-3' >
-                                            <div className='d-flex flex-row flex-wrap align-items-center justify-content-between'>
-                                                <div className="col mb-2">
-                                                    <div className="d-flex align-items-center">
-                                                        <img className="flex-shrink-0 img-fluid rounded" src={order.pic} alt="" style={{ width: '80px' }} />
-                                                        <div className="w-100 d-flex flex-column text-start ps-4">
-                                                            <h5 className="d-flex justify-content-between border-bottom pb-2">
-                                                                <span>{order.name}</span>
-                                                                <span className="text-primary">${order.price}</span>
-                                                            </h5>
-                                                            <small className=" d-flex justify-content-between">
-                                                                <span className='fst-italic'>Quantity: {order.quantity}</span>
-                                                                <span className='fst-italic'>{dayjs(order.CreatedDate).format('MMMM D, YYYY')}</span>
-                                                            </small>
-
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-
-                                    )) }
+                                    <>
+                                        <div className='row heading m-5'>
+                                            <h2 className='text-center'>Orders History</h2>
+                                        </div>
+                                        <div className='table-responsive'>
+                                            <Table columns={columns} dataSource={data} />
+                                        </div>
+                                    </>
+                                }
                                 {modalSelection === 'update-profile' &&
-                                    <Card  style={{
+                                    <Card style={{
                                         width: 440,
                                         border: 'none',
                                         transition: 'box-shadow 0.3s ease-in-out',
@@ -183,7 +322,7 @@ export default function Profile() {
                                         <form action="">
                                             <div className="row mb-3">
                                                 <div className="col">
-                                                    <h1 className='text-center fs-1 fw-semibold' style={{ fontFamily: "Courier New" }}>Update Profile</h1>
+                                                    <h1 className='text-center fs-1 fw-semibold' style={{ fontFamily: "Lato" }}>Update Profile</h1>
                                                 </div>
                                             </div>
                                             <div className="row mb-3">
@@ -191,20 +330,10 @@ export default function Profile() {
                                                     <Input type='text' size="large" placeholder="Full Name" prefix={<UserOutlined />} name='fullName' value={state.fullName} onChange={handleChange} />
                                                 </div>
                                             </div>
-                                            <div className="row mb-3">
-                                                <div className="col">
-                                                    <Input.Password size="large" placeholder="Old Password" name='oldPassword' value={state.oldPassword}  onChange={handleChange} />
-                                                </div>
-                                            </div>
-                                            <div className="row mb-3">
-                                                <div className="col">
-                                                    <Input.Password size="large" placeholder="New Password" name='newPassword' value={state.newPassword}  onChange={handleChange} />
-                                                </div>
-                                            </div>
                                             <div className="row px-3">
-                                                <button className='btn btn-primary fw-semibold' onClick={handleUpdate}>Update</button>
+                                                <Button className='btn btn-primary fw-semibold pb-3 update-btn' loading={loading} onClick={handleUpdate}>Update</Button>
                                             </div>
-                                            
+
                                         </form>
                                     </Card>}
                             </Modal>

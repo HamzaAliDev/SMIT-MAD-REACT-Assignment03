@@ -5,8 +5,8 @@ import { useAuthContext } from '../../../contexts/AuthContext';
 import { useMenuContext } from '../../../contexts/MenuContext';
 
 export default function Menu() {
-    const {isAuthenticated, user} = useAuthContext();
-    const {menuItems} = useMenuContext();
+    const { isAuthenticated, user } = useAuthContext();
+    const { menuItems } = useMenuContext();
     const [activeTab, setActiveTab] = useState('tab-1')
     const [orders, setOrders] = useState([])
     const [data, setData] = useState([])
@@ -36,20 +36,23 @@ export default function Menu() {
 
     // place order in the cart 
     const handleOrder = (id) => {
-       
-        if (!isAuthenticated) { window.toastify("Please Login",'error'); return navigate('/auth/login') }
+
+        if (!isAuthenticated) { window.toastify("Please Login", 'error'); return navigate('/auth/login') }
 
         //get current user.
         let userId = user.id
 
+        let verifyOrder = orders.find(odr => odr.itemId === id && odr.userId === userId)
+        if (verifyOrder) { return window.toastify("Already in Cart", "info") }
+
         const order = {
-           itemId:id,
+            itemId: id,
             userId
         }
         const updatedOrders = [...orders, order];
         setOrders(updatedOrders);
         localStorage.setItem('Orders', JSON.stringify(updatedOrders));
-        window.toastify("Order Add Successfully!",'success');
+        window.toastify("Order Add Successfully!", 'success');
     }
 
     return (
@@ -106,7 +109,7 @@ export default function Menu() {
                                                         <h5 className="card-title">{item.title}</h5>
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
-                                                    <p className="card-text" style={{height:48, overflow:"hidden", textOverflow:"ellipsis"}}>{item.ingredients}</p>
+                                                    <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
                                                     <div className='row px-2'>
                                                         <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
                                                     </div>
@@ -117,7 +120,7 @@ export default function Menu() {
                                 </div>
                             </div>
                             <div id="tab-2" className={`tab-pane fade ${activeTab === 'tab-2' ? 'show active' : ''} p-0`}>
-                            <div className='row d-flex flex-wrap align-items-center justify-content-center'>
+                                <div className='row d-flex flex-wrap align-items-center justify-content-center'>
                                     {data.map((item, index) => (
                                         <div className='col-lg-3 col-md-4 col-sm-6'>
                                             <div key={index} className="card rounded-5 mb-3">
@@ -127,7 +130,7 @@ export default function Menu() {
                                                         <h5 className="card-title">{item.title}</h5>
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
-                                                    <p className="card-text" style={{height:48, overflow:"hidden", textOverflow:"ellipsis"}}>{item.ingredients}</p>
+                                                    <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
                                                     <div className='row px-2'>
                                                         <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
                                                     </div>
@@ -138,7 +141,7 @@ export default function Menu() {
                                 </div>
                             </div>
                             <div id="tab-3" className={`tab-pane fade ${activeTab === 'tab-3' ? 'show active' : ''} p-0`}>
-                            <div className='row d-flex flex-wrap align-items-center justify-content-center'>
+                                <div className='row d-flex flex-wrap align-items-center justify-content-center'>
                                     {data.map((item, index) => (
                                         <div className='col-lg-3 col-md-4 col-sm-6'>
                                             <div key={index} className="card rounded-5 mb-3">
@@ -148,7 +151,7 @@ export default function Menu() {
                                                         <h5 className="card-title">{item.title}</h5>
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
-                                                    <p className="card-text" style={{height:48, overflow:"hidden", textOverflow:"ellipsis"}}>{item.ingredients}</p>
+                                                    <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
                                                     <div className='row px-2'>
                                                         <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
                                                     </div>

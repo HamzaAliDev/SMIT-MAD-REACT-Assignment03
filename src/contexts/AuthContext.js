@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext, createContext, useReducer } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, firestore } from '../config/firebase';
 import { Navigate } from 'react-router-dom';
 
@@ -53,8 +53,25 @@ export default function AuthContext({ children }) {
     }
     // console.log(state)
 
+    const updateProfile = useCallback(
+        async (newProfileData) => {
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error("No user is currently signed in.");
+
+                const userDocRef = doc(firestore, "users", user.uid);
+                await updateDoc(userDocRef, newProfileData);
+
+                dispatch({ type: 'SET_PROFILE', payload: { user: { ...state.user, ...newProfileData } } });
+            } catch (error) {
+                console.error("Profile update failed:", error);
+            }
+        },
+        [dispatch, state.user]
+    );
+
     return (
-        <Auth.Provider value={{ ...state, dispatch, isAppLoading, setIsAppLoading, handleLogout }}>
+        <Auth.Provider value={{ ...state, dispatch, isAppLoading, setIsAppLoading, handleLogout, updateProfile }}>
             {children}
         </Auth.Provider>
     )

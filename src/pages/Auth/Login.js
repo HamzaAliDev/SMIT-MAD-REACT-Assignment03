@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Button, Card, Input } from 'antd'
+import { Button, Card, Input, Modal } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import bgImg from '../../../src/assets/pic/bg.jpeg';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { auth } from '../../config/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 
 const initialState = { email: '', password: '' };
 
@@ -14,11 +14,13 @@ export default function Login() {
     const [state, setState] = useState(initialState)
     const [hover, setHover] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
     const navigate = useNavigate();
 
     // handle card hover effect.
-    const handleMouseEnter = () =>  setHover(true);
-    const handleMouseLeave = () =>  setHover(false);
+    const handleMouseEnter = () => setHover(true);
+    const handleMouseLeave = () => setHover(false);
 
     // handle state.
     const handleChange = e => setState(s => ({ ...s, [e.target.name]: e.target.value }))
@@ -44,6 +46,7 @@ export default function Login() {
                 navigate('/home')
             })
             .catch((error) => {
+
                 console.log("error", error)
                 switch (error.code) {
                     case 'auth/invalid-credential':
@@ -52,8 +55,40 @@ export default function Login() {
                         window.toastify("Something went wrong  while signing", 'error');
                 }
                 setIsProcessing(false);
+                setShowForgotPassword(true);
             }
-        );
+            );
+    }
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const handlePasswordReset = () => {
+        const { email } = state;
+        if (!email) {
+            window.toastify("Please enter your email to reset your password", 'error');
+            return;
+        }
+        
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                window.toastify("Password reset email sent! Please check your inbox.", "success");
+                setIsModalOpen(false);
+            })
+            .catch((error) => {
+                console.error("Error sending reset email:", error);
+                window.toastify("Error sending reset email. Please try again later.", "error");
+            }).finally(()=>{
+                setIsModalOpen(false);
+            })
+
     }
 
     return (
@@ -87,12 +122,19 @@ export default function Login() {
                             <Input type='email' size="large" placeholder="email" prefix={<UserOutlined />} name='email' value={state.email} onChange={handleChange} />
                         </div>
                     </div>
-                    <div className="row mb-3">
+                    <div className="row ">
                         <div className="col">
                             <Input.Password size="large" placeholder="password" name='password' value={state.password} onChange={handleChange} />
                         </div>
                     </div>
-                    <div className="row px-3">
+                    <div className="row m-0 p-0">
+                        <div className="col text-end">
+                            {showForgotPassword && (
+                                <span className='text-end fw-semibold m-0 p-0' style={{ cursor: 'pointer' }} onClick={showModal}>Forgot Password</span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="row mt-3 px-3">
                         <Button className='btn btn-primary fw-semibold login-btn' size="large" loading={isProcessing} onClick={handleLogin}>Login</Button>
                     </div>
                     <div className="row mt-2">
@@ -100,8 +142,14 @@ export default function Login() {
                             <p className=' text-center fs-6 fw-semibold' >Don't have an account? <Link to='/auth/register' style={{ color: '#f1733d', textDecoration: 'none' }}>Register</Link></p>
                         </div>
                     </div>
+
                 </form>
             </Card>
+            <Modal title="Reset Password" open={isModalOpen}  onCancel={handleCancel} footer={null}>
+                <p>Click on the send button.We will send a password reset email to: {state.email}</p>
+                <button className='btn btn-primary' onClick={handlePasswordReset}>Send</button>
+                <p>Please check your email for further instructions.</p>
+            </Modal>
         </main>
     )
 }
