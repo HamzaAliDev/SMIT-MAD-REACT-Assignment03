@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button, Card, Input, Modal, Table, Tag } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
@@ -18,10 +18,9 @@ export default function Profile() {
     const { user, handleLogout, updateProfile } = useAuthContext();
     const { menuItems } = useMenuContext();
     const [tableBookings, setTableBookings] = useState([]);
-    const [profileImg, setProfileImg] = useState('');
 
-
-    const loadDataOrderHistory = async () => {
+    // load data
+    const loadDataOrderHistory = useCallback(async () => {
         const q = query(collection(firestore, "Order-History"), where("userId", "==", user.id));
         const ordersHistory = [];
         const querySnapshot = await getDocs(q);
@@ -32,9 +31,10 @@ export default function Profile() {
 
         });
         setOrders(ordersHistory)
-    }
+    }, [user.id])
 
-    const loadDataTableBookings = async () => {
+    // load data
+    const loadDataTableBookings = useCallback(async () => {
         const q = query(collection(firestore, "Table-Bookings"), where("userId", "==", user.id));
         const bookingHistory = [];
         const querySnapshot = await getDocs(q);
@@ -45,12 +45,15 @@ export default function Profile() {
 
         });
         setTableBookings(bookingHistory)
-    }
+    }, [user.id])
+
+
     useEffect(() => {
         loadDataOrderHistory();
         loadDataTableBookings();
-    }, [])
+    }, [loadDataOrderHistory, loadDataTableBookings])
 
+    // upload profile picture and get url
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -88,36 +91,38 @@ export default function Profile() {
         );
     }
 
-    const updateUserProfile = async(url) => {
+    // update user profile with url
+    const updateUserProfile = async (url) => {
         try {
             // Update Firestore with the new profile image URL
-        const userRef = doc(firestore, "users", user.id);
-        await updateDoc(userRef, { profileImgUrl: url });
+            const userRef = doc(firestore, "users", user.id);
+            await updateDoc(userRef, { profileImgUrl: url });
 
-       const updateProfileData = {
-         profileImgUrl : url,
-       }
-       await updateProfile(updateProfileData)
+            const updateProfileData = {
+                profileImgUrl: url,
+            }
+            await updateProfile(updateProfileData)
 
         } catch (error) {
             console.error("error", error)
-            window.toastify("Something went wrong while adding Image",'error')
+            window.toastify("Something went wrong while adding Image", 'error')
         }
-        
+
     }
+
+    // selection of modal which modal shoeld be open
     const showModal = (value) => {
         setIsModalOpen(true);
 
         if (value === 'booking-history') {
             setModalSelection(value)
-            // getBookingHistory();
         } else if (value === "update-profile") {
             setModalSelection(value)
         } else {
             setModalSelection(value)
-            // getOrderHistory();
         }
     };
+
     const handleOk = () => {
         setIsModalOpen(false);
     };
@@ -128,6 +133,7 @@ export default function Profile() {
 
     const handleChange = (e) => setState(s => ({ ...s, [e.target.name]: e.target.value }))
 
+    // handle update user name
     const handleUpdate = async (e) => {
         e.preventDefault();
 
@@ -154,7 +160,7 @@ export default function Profile() {
             setIsModalOpen(false);
         } catch (error) {
             console.error("Error updating profile:", error);
-            window.toastify("Something went wrong while updating the profile",'error');
+            window.toastify("Something went wrong while updating the profile", 'error');
         } finally {
             setLoading(false);
         }
@@ -164,6 +170,7 @@ export default function Profile() {
         setIsModalOpen(false);
     }
 
+    // data column for order history
     const columns = [
         { title: 'St#', dataIndex: 'num', key: 'num' },
         { title: 'pic Items Quantity', dataIndex: 'pic_items_quantity', key: 'pic_items_quantity', },
@@ -184,7 +191,7 @@ export default function Profile() {
         },
     ];
 
-    // data on table
+    // data on table for order history
     const data = orders.map((u, i) => {
         let totalPrice = 0;
         // Create ordered list for the items using the item name and quantity
@@ -203,7 +210,7 @@ export default function Profile() {
 
                     return (
                         <li key={item.itemId} className='mb-2'>
-                            <img src={imgUrl} className='rounded-3' alt="image" style={{ width: 50, height: 50 }} /> {title} (Quantity: {item.quantity})
+                            <img src={imgUrl} className='rounded-3' alt="" style={{ width: 50, height: 50 }} /> {title} (Quantity: {item.quantity})
                         </li>
                     );
                 })}
@@ -220,7 +227,7 @@ export default function Profile() {
         }
     });
 
-
+    // booking data columns
     const TableDataColumns = [
         { title: 'St#', dataIndex: 'num', key: 'num' },
         { title: 'Name', dataIndex: 'fullName', key: 'fullName', },
@@ -242,6 +249,7 @@ export default function Profile() {
         },
     ];
 
+    // data of bookings in table
     const TableData = tableBookings.map((u, i) => {
         return {
             key: i + 1,
@@ -268,7 +276,7 @@ export default function Profile() {
                             <div className="profile-header">
                                 <div className='profile-img-container'>
                                     {user.profileImgUrl ? (
-                                        <img src={user.profileImgUrl} alt="Profile Picture" className="profile-picture" />
+                                        <img src={user.profileImgUrl} alt="Profile" className="profile-picture" />
                                     ) : (
                                         <i className="fa fs-4 fa-user text-secondary profile-picture-icon"></i>
                                     )}
@@ -277,7 +285,7 @@ export default function Profile() {
                                         <i className="fa fa-camera text-secondary"></i>
                                     </label>
 
-                                    <input type="file" id="fileInput" className="file-input" accept="image/*" name="profileImg"  onChange={handleImageUpload} />
+                                    <input type="file" id="fileInput" className="file-input" accept="image/*" name="profileImg" onChange={handleImageUpload} />
                                 </div>
                                 <div className='ms-4 pt-4'>
                                     <h1 className="username">{user.fullName}</h1>
