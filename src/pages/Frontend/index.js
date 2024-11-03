@@ -12,11 +12,12 @@ import Profile from './Profile';
 import NoPage404 from './NoPage404';
 import Navbar from './../../components/Header/Navbar';
 import Footer from './../../components/Footer';
+import Favourites from './Favourites';
 
 export default function Frontend() {
   const location = useLocation();
-  const routesWithHeader = ['/home', '/service', '/menu', '/orders', '/contact', '/booking', '/profile'];
-  const routesWithFooter = ['/home', '/service', '/menu', '/orders', '/contact', '/booking'];
+  const routesWithHeader = ['/home', '/service', '/menu', '/orders', '/contact', '/booking', '/profile', '/favourites'];
+  const routesWithFooter = ['/home', '/service', '/menu', '/orders', '/contact', '/booking', '/profile', '/favourites'];
   const showHeader = routesWithHeader.includes(location.pathname)
   const showFooter = routesWithFooter.includes(location.pathname)
 
@@ -31,6 +32,7 @@ export default function Frontend() {
         <Route path='/orders' element={<Orders />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/booking' element={<Booking />} />
+        <Route path='/favourites' element={<Favourites />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/*' element={<NoPage404 />} />
 

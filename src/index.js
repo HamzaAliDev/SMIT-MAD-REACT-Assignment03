@@ -7,7 +7,9 @@ import '../src/config/global';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import AuthContextProvider from './contexts/AuthContext';
-import MenuProvider  from './contexts/MenuContext';
+import MenuProvider from './contexts/MenuContext';
+import CartProvider from './contexts/CartContext';
+import WishListContext from './contexts/WishlistContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,7 +17,11 @@ root.render(
     <BrowserRouter>
       <AuthContextProvider>
         <MenuProvider>
-          <App />
+          <CartProvider>
+            <WishListContext>
+              <App />
+            </WishListContext>
+          </CartProvider>
         </MenuProvider>
       </AuthContextProvider>
     </BrowserRouter>

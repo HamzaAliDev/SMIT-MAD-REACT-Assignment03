@@ -92,3 +92,29 @@ $pColor: #fb8500;
 .dropdown-menu-header .dropdown-link:hover {
     color: $pColor;
 }
+
+.nav-img-container {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-top: -10px;
+}
+
+.profile-picture-navbar {
+    width: 43px;
+    height: 43px;
+    margin-top: -1px;
+}
+
+.profile-icon-navbar {
+    margin-top: 13px;
+
+    &:hover {
+        color: $pColor !important;
+    }
+}
+
+.badge-position {
+    margin-top: 21px;
+}

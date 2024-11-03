@@ -127,7 +127,7 @@ export default function Home() {
         <MenuList />
 
         {/* reservation */}
-        <Reservation />
+        <Reservation onReservationSuccess={() => { }} />
 
         {/* testimonial */}
         <div className="container-xxl py-5 ">

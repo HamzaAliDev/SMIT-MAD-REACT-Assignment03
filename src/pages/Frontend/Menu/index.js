@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
 import HeaderOther from '../../../components/Header/HeaderOther';
 import { useAuthContext } from '../../../contexts/AuthContext';
 import { useMenuContext } from '../../../contexts/MenuContext';
+import { useCartContext } from '../../../contexts/CartContext';
+import { useWishlistContext } from '../../../contexts/WishlistContext';
 
 export default function Menu() {
     const { isAuthenticated, user } = useAuthContext();
+    const { setCartCounting } = useCartContext();
+    const { uploadFavourites, removeFavourites, dataList } = useWishlistContext();
     const { menuItems } = useMenuContext();
     const [activeTab, setActiveTab] = useState('tab-1')
     const [orders, setOrders] = useState([])
     const [data, setData] = useState([])
+    const [favorites, setFavorites] = useState({});
     const navigate = useNavigate();
 
     const loadData = useCallback((activeTab) => {
@@ -34,6 +40,15 @@ export default function Menu() {
         loadData(activeTab);
     }, [activeTab, loadData]);
 
+    useEffect(() => {
+        // Initialize favorites based on dataList
+        const initialFavorites = {};
+        dataList.forEach(itemId => {
+            initialFavorites[itemId] = true;
+        });
+        setFavorites(initialFavorites);
+    }, [dataList]);
+
     // place order in the cart 
     const handleOrder = (id) => {
 
@@ -52,7 +67,21 @@ export default function Menu() {
         const updatedOrders = [...orders, order];
         setOrders(updatedOrders);
         localStorage.setItem('Orders', JSON.stringify(updatedOrders));
+
+        const filteredData = updatedOrders.filter(item => item.userId === user.id) || [];
+        setCartCounting(filteredData.length);
+
         window.toastify("Order Add Successfully!", 'success');
+    }
+
+
+    const toggleWishlistAdd = (itemId) => {
+        uploadFavourites(itemId);
+        setFavorites((prev) => ({ ...prev, [itemId]: true }));
+    };
+    const toggleWishlistRemove = (itemId) => {
+        removeFavourites(itemId);
+        setFavorites((prev) => ({ ...prev, [itemId]: false }));
     }
 
     return (
@@ -101,8 +130,8 @@ export default function Menu() {
                             <div id="tab-1" className={`tab-pane fade ${activeTab === 'tab-1' ? 'show active' : ''} p-0`}>
                                 <div className='row d-flex flex-wrap align-items-center justify-content-center'>
                                     {data.map((item, index) => (
-                                        <div className='col-lg-3 col-md-4 col-sm-6'>
-                                            <div key={index} className="card rounded-5 mb-3">
+                                        <div key={index} className='col-lg-3 col-md-4 col-sm-6'>
+                                            <div className="card rounded-5 mb-3">
                                                 <img src={item.imgUrl} className="card-img-top rounded-top-5" alt="..." style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                                 <div className="card-body">
                                                     <div className='d-flex justify-content-between'>
@@ -110,8 +139,25 @@ export default function Menu() {
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
                                                     <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
-                                                    <div className='row px-2'>
-                                                        <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                    <div className='row px-1  d-flex flex-row justify-content-center align-items-center'>
+                                                        <div className="col-10 p-0">
+                                                            <button className='btn btn-primary w-100 p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                        </div>
+                                                        <div className="col-2">
+                                                            {favorites[item.itemId] ? (
+                                                                <HeartFilled
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "red" }}
+                                                                    onClick={() => toggleWishlistRemove(item.itemId)}
+                                                                />
+                                                            ) : (
+                                                                <HeartOutlined
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "gray" }}
+                                                                    onClick={() => toggleWishlistAdd(item.itemId)}
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -122,8 +168,8 @@ export default function Menu() {
                             <div id="tab-2" className={`tab-pane fade ${activeTab === 'tab-2' ? 'show active' : ''} p-0`}>
                                 <div className='row d-flex flex-wrap align-items-center justify-content-center'>
                                     {data.map((item, index) => (
-                                        <div className='col-lg-3 col-md-4 col-sm-6'>
-                                            <div key={index} className="card rounded-5 mb-3">
+                                        <div key={index} className='col-lg-3 col-md-4 col-sm-6'>
+                                            <div className="card rounded-5 mb-3">
                                                 <img src={item.imgUrl} className="card-img-top rounded-top-5" alt="..." style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                                 <div className="card-body">
                                                     <div className='d-flex justify-content-between'>
@@ -131,8 +177,25 @@ export default function Menu() {
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
                                                     <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
-                                                    <div className='row px-2'>
-                                                        <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                    <div className='row px-1  d-flex flex-row justify-content-center align-items-center'>
+                                                        <div className="col-10 p-0">
+                                                            <button className='btn btn-primary w-100 p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                        </div>
+                                                        <div className="col-2">
+                                                            {favorites[item.itemId] ? (
+                                                                <HeartFilled
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "red" }}
+                                                                    onClick={() => toggleWishlistRemove(item.itemId)}
+                                                                />
+                                                            ) : (
+                                                                <HeartOutlined
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "gray" }}
+                                                                    onClick={() => toggleWishlistAdd(item.itemId)}
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -143,8 +206,8 @@ export default function Menu() {
                             <div id="tab-3" className={`tab-pane fade ${activeTab === 'tab-3' ? 'show active' : ''} p-0`}>
                                 <div className='row d-flex flex-wrap align-items-center justify-content-center'>
                                     {data.map((item, index) => (
-                                        <div className='col-lg-3 col-md-4 col-sm-6'>
-                                            <div key={index} className="card rounded-5 mb-3">
+                                        <div key={index} className='col-lg-3 col-md-4 col-sm-6'>
+                                            <div className="card rounded-5 mb-3">
                                                 <img src={item.imgUrl} className="card-img-top rounded-top-5" alt="..." style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                                 <div className="card-body">
                                                     <div className='d-flex justify-content-between'>
@@ -152,8 +215,25 @@ export default function Menu() {
                                                         <h5 className="card-title">${item.price}</h5>
                                                     </div>
                                                     <p className="card-text" style={{ height: 48, overflow: "hidden", textOverflow: "ellipsis" }}>{item.ingredients}</p>
-                                                    <div className='row px-2'>
-                                                        <button className='btn btn-primary p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                    <div className='row px-1  d-flex flex-row justify-content-center align-items-center'>
+                                                        <div className="col-10 p-0">
+                                                            <button className='btn btn-primary w-100 p-1 rounded-4 add-btn' onClick={() => { handleOrder(item.itemId) }}>Add</button>
+                                                        </div>
+                                                        <div className="col-2">
+                                                            {favorites[item.itemId] ? (
+                                                                <HeartFilled
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "red" }}
+                                                                    onClick={() => toggleWishlistRemove(item.itemId)}
+                                                                />
+                                                            ) : (
+                                                                <HeartOutlined
+                                                                    className='wishlist-icon'
+                                                                    style={{ color: "gray" }}
+                                                                    onClick={() => toggleWishlistAdd(item.itemId)}
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -5,9 +5,11 @@ import { Button, Card, InputNumber } from 'antd';
 import { useAuthContext } from '../../../contexts/AuthContext';
 import { useMenuContext } from '../../../contexts/MenuContext';
 import { firestore } from '../../../config/firebase';
+import { useCartContext } from '../../../contexts/CartContext';
 
 export default function Orders() {
   const { user } = useAuthContext();
+  const { setCartCounting } = useCartContext();
   const { menuItems } = useMenuContext();
   const [quantity, setQuantity] = useState({});
   const [data, setData] = useState([]);
@@ -37,14 +39,13 @@ export default function Orders() {
     setConfirmedOrderList(list)
   }, [user.id])
 
-  const populatingData = useCallback(
-    (orderData) => {
-      let populatedOrders = orderData.map((order, i) => {
-        const menuItem = menuItems.find(item => item.itemId === order.itemId);
-        return menuItem ? { ...menuItem } : order; // Add menu item details to the order object
-      });
-      return populatedOrders;
-    },
+  const populatingData = useCallback((orderData) => {
+    let populatedOrders = orderData.map((order, i) => {
+      const menuItem = menuItems.find(item => item.itemId === order.itemId);
+      return menuItem ? { ...menuItem } : order; // Add menu item details to the order object
+    });
+    return populatedOrders;
+  },
     [menuItems]
   );
 
@@ -53,9 +54,9 @@ export default function Orders() {
     if (!user?.id) return; // Make sure user.id is available
     let orderList = JSON.parse(localStorage.getItem('Orders')) || [];
     let filteredData = orderList.filter(order => order.userId === user.id)
-
+    setCartCounting(filteredData.length);
     setData(populatingData(filteredData))
-  }, [user.id, populatingData]);
+  }, [user.id, populatingData, setCartCounting]);
 
   useEffect(() => {
     loadData();
@@ -247,8 +248,8 @@ export default function Orders() {
                 <div className='row d-flex justify-content-round'>
                   {confirmOrderShow.length > 0 &&
                     confirmOrderShow.map((orderBatch, idx) => (
-                      <div className="col-lg-4 col-md-6 col-sm-12 p-2" >
-                        <Card hoverable className="" key={idx}>
+                      <div key={idx} className="col-lg-4 col-md-6 col-sm-12 p-2" >
+                        <Card hoverable className="">
                           <h5 className="mb-5">Order Confirmed #{idx + 1}</h5>
                           {orderBatch.map((order, z) => (
                             <div key={z} className="mb-3">

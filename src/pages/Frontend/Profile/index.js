@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Button, Card, Input, Modal, Table, Tag } from 'antd'
+import { Button, Card, Input, Modal, Progress, Table, Tag } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
@@ -18,6 +18,9 @@ export default function Profile() {
     const { user, handleLogout, updateProfile } = useAuthContext();
     const { menuItems } = useMenuContext();
     const [tableBookings, setTableBookings] = useState([]);
+    const [showProgressBar, setShowProgressBar] = useState(false);
+    const [showImage, setShowImage] = useState(true);
+    const [progress, setProgress] = useState(0);
 
     // load data
     const loadDataOrderHistory = useCallback(async () => {
@@ -58,6 +61,9 @@ export default function Profile() {
         const file = event.target.files[0];
         if (!file) return;
 
+        setShowImage(false);
+        setShowProgressBar(true);
+
         const storageRef = ref(storage, 'profile-images/' + file.name);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -71,6 +77,7 @@ export default function Profile() {
                 // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 console.log('Upload is ' + progress + '% done');
+                setProgress(progress);
             },
             (error) => {
                 // setConfirmLoading(false)
@@ -106,6 +113,9 @@ export default function Profile() {
         } catch (error) {
             console.error("error", error)
             window.toastify("Something went wrong while adding Image", 'error')
+        } finally {
+            setShowImage(true);
+            setShowProgressBar(false);
         }
 
     }
@@ -275,18 +285,31 @@ export default function Profile() {
                             </div>
                             <div className="profile-header">
                                 <div className='profile-img-container'>
-                                    {user.profileImgUrl ? (
-                                        <img src={user.profileImgUrl} alt="Profile" className="profile-picture" />
-                                    ) : (
-                                        <i className="fa fs-4 fa-user text-secondary profile-picture-icon"></i>
-                                    )}
+                                    <div className='show-img-section'>
+                                        <div className={`loading-img p-2 ${!showProgressBar && 'd-none'}`}>
+                                            <Progress
+                                                type="dashboard"
+                                                steps={8}
+                                                percent={Math.round(progress)}
+                                                trailColor="rgba(0, 0, 0, 0.06)"
+                                                strokeWidth={20}
+                                            />
+                                        </div>
+                                        {user.profileImgUrl ? (
+                                            <img src={user.profileImgUrl} alt="Profile" className={`profile-picture ${!showImage && 'd-none'}`} />
+                                        ) : (
+                                            <i className={`fa fs-4 fa-user text-secondary profile-picture-icon ${!showImage && 'd-none'}`}></i>
+                                        )}
 
-                                    <label htmlFor="fileInput" className="edit-icon">
-                                        <i className="fa fa-camera text-secondary"></i>
-                                    </label>
+                                        <label htmlFor="fileInput" className="edit-icon">
+                                            <i className="fa fa-camera text-secondary"></i>
+                                        </label>
 
-                                    <input type="file" id="fileInput" className="file-input" accept="image/*" name="profileImg" onChange={handleImageUpload} />
+                                        <input type="file" id="fileInput" className="file-input" accept="image/*" name="profileImg" onChange={handleImageUpload} />
+                                    </div>
+
                                 </div>
+
                                 <div className='ms-4 pt-4'>
                                     <h1 className="username">{user.fullName}</h1>
                                     <p className="bio">Passionate about good food and great experiences.</p>

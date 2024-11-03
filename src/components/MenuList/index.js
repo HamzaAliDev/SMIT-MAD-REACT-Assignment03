@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMenuContext } from '../../contexts/MenuContext';
 import { useAuthContext } from '../../contexts/AuthContext';
+import { useCartContext } from '../../contexts/CartContext';
 
 export default function MenuList() {
     const { isAuthenticated, user } = useAuthContext();
     const { menuItems } = useMenuContext();
+    const { setCartCounting } = useCartContext();
     const [activeTab, setActiveTab] = useState('tab-1')
     const [orders, setOrders] = useState([])
     const [data, setData] = useState([])
@@ -42,6 +44,9 @@ export default function MenuList() {
         //get current user.
         let userId = user.id
 
+        let verifyOrder = orders.find(odr => odr.itemId === id && odr.userId === userId)
+        if (verifyOrder) { return window.toastify("Already in Cart", "info") }
+
         const order = {
             userId,
             itemId: id,
@@ -49,6 +54,9 @@ export default function MenuList() {
         const updatedOrders = [...orders, order];
         setOrders(updatedOrders);
         localStorage.setItem('Orders', JSON.stringify(updatedOrders));
+
+        const filteredData = updatedOrders.filter(item => item.userId === user.id) || [];
+        setCartCounting(filteredData.length);
 
         window.toastify("Order Add Successfully!", "success");
     }

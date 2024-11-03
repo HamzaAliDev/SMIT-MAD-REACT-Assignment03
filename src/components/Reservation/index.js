@@ -5,6 +5,7 @@ import table2Img from './../../assets/pic/table1.jpg';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { firestore } from '../../config/firebase';
+import { Button } from 'antd';
 
 const initialState = { fullName: '', email: '', reservedTime: '', noOfPeople: '', request: '' };
 const isValidEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
@@ -12,15 +13,16 @@ const isValidEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 export default function Reservation({ onReservationSuccess }) {
   const { isAuthenticated, user } = useAuthContext();
   const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
   // handle state change
   const handleChange = e => setState(s => ({ ...s, [e.target.name]: e.target.value }))
-  
-// booking added function
+
+  // booking added function
   const handleBooking = async (e) => {
     e.preventDefault();
-    
+
     // check login.
     if (!isAuthenticated) { window.toastify("Please Login", "info"); return navigate('/auth/login') }
 
@@ -32,13 +34,13 @@ export default function Reservation({ onReservationSuccess }) {
     if (fullName.length < 3) { return window.toastify("Enter correct username", "error") }
     if (!email.match(isValidEmail)) { return window.toastify("Invalid Email", 'error') }
 
-     // Validate that the reserved date is not in the past
-     const selectedDateTime = new Date(reservedTime);
-     const currentDateTime = new Date();
- 
-     if (selectedDateTime < currentDateTime) {
-       return window.toastify("Cannot select a past date and time for reservation", "error");
-     }
+    // Validate that the reserved date is not in the past
+    const selectedDateTime = new Date(reservedTime);
+    const currentDateTime = new Date();
+
+    if (selectedDateTime < currentDateTime) {
+      return window.toastify("Cannot select a past date and time for reservation", "error");
+    }
 
     //get current userId.
     let userId = user.id;
@@ -49,11 +51,12 @@ export default function Reservation({ onReservationSuccess }) {
       reservedTime,
       noOfPeople,
       request,
-      status:'active',
+      status: 'active',
       bookingTime: serverTimestamp(),
     }
 
-    
+    setLoading(true);
+
     try {
       // Create a new document reference with an auto-generated ID
       const newDocRef = doc(collection(firestore, "Table-Bookings"));
@@ -69,10 +72,12 @@ export default function Reservation({ onReservationSuccess }) {
 
       window.toastify("Booking Added Successfully", "success")
       setState(initialState);
-       
+      setLoading(false);
+
       // Call the success callback to refresh the bookings
       onReservationSuccess();
     } catch (error) {
+      setLoading(false);
       console.error("Error adding document: ", error.message);
       window.toastify("Something went wrong while Add booking", "success")
     }
@@ -129,7 +134,7 @@ export default function Reservation({ onReservationSuccess }) {
                   </div>
                 </div>
                 <div className="col-12">
-                  <button className="btn btn-primary w-100 py-3"  type="submit" onClick={handleBooking}>Book Now</button>
+                  <Button className="btn btn-primary w-100 p-4 d-flex align-items-center" loading={loading} type="submit" onClick={handleBooking}><span>Book Now</span></Button>
                 </div>
               </div>
             </form>

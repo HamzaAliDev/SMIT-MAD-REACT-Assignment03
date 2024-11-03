@@ -1,15 +1,21 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
+import { Badge } from 'antd';
+import { useCartContext } from '../../contexts/CartContext';
+import { useWishlistContext } from '../../contexts/WishlistContext';
 
 export default function Navbar() {
-    const { handleLogout, isAuthenticated } = useAuthContext()
-    const navigate = useNavigate()
+    const { handleLogout, isAuthenticated, user } = useAuthContext();
+    const { cartCounting } = useCartContext();
+    const {wishlistCounting} = useWishlistContext();
+    const navigate = useNavigate();
+
 
     // handle logout
     const handleLogOut = () => {
         handleLogout();
-        window.toastify("Successfully Logout","success")
+        window.toastify("Successfully Logout", "success")
         navigate('/')
     }
 
@@ -26,10 +32,22 @@ export default function Navbar() {
                     <NavLink to='home' className="nav-item nav-link" activeclassname="active" >Home</NavLink>
                     <NavLink to='service' className="nav-item nav-link" activeclassname="active" >Service</NavLink>
                     <NavLink to='menu' className="nav-item nav-link" activeclassname="active" >Menu</NavLink>
-                    <NavLink to='orders' className="nav-item nav-link" activeclassname="active" >Orders</NavLink>
                     <NavLink to='contact' className="nav-item nav-link" activeclassname="active" >Contact</NavLink>
+                    <NavLink to='orders' activeclassname="active" ><Badge count={cartCounting} size='small' color='#fb8500' className='nav-item nav-link badge-position p-0'><i className="fas fa-bag-shopping fa-lg " ></i></Badge></NavLink>
+                    <NavLink to='favourites' activeclassname="active" ><Badge count={wishlistCounting} size='small' color='#fb8500' className='nav-item nav-link mt-4 p-0'><i className="fas fa-heart fa-lg " ></i></Badge></NavLink>
                     <div className="nav-item dropdown">
-                        <Link className="nav-link dropdown-toggle" data-bs-toggle="dropdown" >Pages</Link>
+                        <Link className="nav-link " data-bs-toggle="dropdown" >
+                            <div className='nav-img-container'>
+                                {isAuthenticated && (
+                                    user.profileImgUrl ? (
+                                        <img src={user.profileImgUrl} alt="Profile" className="profile-picture-navbar rounded-5" />
+                                    ) : (
+                                        <i className="fa fa-user fa-lg text-white rounded-5 profile-icon-navbar p-2 "></i>
+                                    )
+                                )}
+
+                            </div>
+                        </Link>
                         <div className="dropdown-menu dropdown-menu-header m-0 ">
 
                             <NavLink to='booking' className="dropdown-item dropdown-link" >Booking</NavLink>
